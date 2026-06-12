@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pioneer Legal Consulting – Solar Client Intake</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/*
+  SWAP: The VIS uses PLC navy/gold as primary brand (legal document feel).
+  If you want Voltaic-specific accents in the chrome (header gradients, focus
+  colors), update the CSS variables below. Legal PDFs always stay PLC branded.
+  Current values: PLC standard navy/gold palette.
+*/
+:root {
+  --navy: #1a2d4e;
+  --navy-mid: #2c4470;
+  --gold: #b8922a;
+  --gold-light: #d4a843;
+  --cream: #faf8f4;
+  --warm-white: #ffffff;
+  --text: #1c1c1c;
+  --text-mid: #3d3d3d;
+  --text-light: #6b6b6b;
+  --border: #d8d2c8;
+  --border-focus: #b8922a;
+  --section-bg: #f4f1ec;
+  --input-bg: #ffffff;
+  --es-color: #5a6e8a;
+  --shadow: 0 2px 12px rgba(26,45,78,0.08);
+  --success: #2d6a4f;
+  --error: #c0392b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); line-height: 1.6; font-size: 15px; }
+
+@media print {
+  body { background: white; font-size: 11pt; }
+  .no-print { display: none !important; }
+  .form-card { box-shadow: none; border: none; }
+  header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  input, textarea { border: none !important; border-bottom: 1px solid #999 !important; background: transparent !important; }
+  .upload-zone { display: none; }
+}
+
+.page-wrap { max-width: 860px; margin: 0 auto; padding: 0 20px 60px; }
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  color: white; padding: 40px 40px 32px; margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:4px; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold)); }
+header::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; border:40px solid rgba(184,146,42,0.12); }
+.firm-name { font-family:'EB Garamond',serif; font-size:26px; font-weight:600; letter-spacing:0.04em; margin-bottom:4px; }
+.firm-sub { font-size:13px; opacity:0.75; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:20px; }
+.form-title { font-family:'EB Garamond',serif; font-size:20px; border-top:1px solid rgba(255,255,255,0.2); padding-top:16px; line-height:1.4; }
+.form-title .es { display:block; font-style:italic; opacity:0.8; font-size:17px; margin-top:4px; }
+.contact-bar { margin-top:16px; font-size:12px; opacity:0.65; letter-spacing:0.03em; }
+
+/* PROGRESS BAR */
+.progress-wrap { background: white; border-radius:8px; box-shadow:var(--shadow); border:1px solid var(--border); padding:16px 24px; margin-bottom:20px; }
+.progress-label { font-size:13px; color:var(--text-light); margin-bottom:8px; display:flex; justify-content:space-between; }
+.progress-track { background:#eee; border-radius:20px; height:6px; overflow:hidden; }
+.progress-fill { height:100%; background: linear-gradient(90deg, var(--navy), var(--gold)); border-radius:20px; transition: width 0.4s ease; width:0%; }
+
+/* INSTRUCTIONS */
+.instructions { background:#eef1f7; border-left:4px solid var(--navy-mid); padding:16px 20px; border-radius:0 6px 6px 0; margin-bottom:24px; font-size:14px; color:var(--text-mid); line-height:1.65; }
+.instructions .es-note { margin-top:10px; color:var(--es-color); font-style:italic; }
+
+/* FORM CARDS */
+.form-card { background:var(--warm-white); border-radius:8px; box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden; margin-bottom:20px; }
+.section-header { background:var(--navy); color:white; padding:14px 24px; display:flex; align-items:baseline; gap:12px; }
+.section-num { font-family:'EB Garamond',serif; font-size:22px; opacity:0.5; min-width:28px; }
+.section-title { font-size:14px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; }
+.section-title-es { font-size:12px; opacity:0.65; font-style:italic; margin-top:1px; }
+
+/* QUESTION BLOCKS */
+.q-block { padding:20px 24px 16px; border-bottom:1px solid var(--section-bg); }
+.q-block:last-child { border-bottom:none; }
+.q-block.alt-bg { background:#fdfcfa; }
+.q-label { font-weight:600; font-size:14.5px; color:var(--text); margin-bottom:2px; line-height:1.4; }
+.q-label-es { font-size:13px; color:var(--es-color); font-style:italic; margin-bottom:10px; line-height:1.4; }
+.q-num { color:var(--gold); font-weight:600; margin-right:6px; font-size:13px; }
+.req { color:#c0392b; margin-left:2px; }
+
+/* INPUTS */
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"], textarea, select {
+  width:100%; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text);
+  background:var(--input-bg); border:1px solid var(--border); border-radius:4px;
+  padding:9px 12px; outline:none; transition:border-color 0.15s, box-shadow 0.15s; margin-top:6px;
+}
+input:focus, textarea:focus, select:focus { border-color:var(--border-focus); box-shadow:0 0 0 3px rgba(184,146,42,0.12); }
+textarea { resize:vertical; min-height:90px; line-height:1.6; }
+textarea.large { min-height:180px; }
+.input-row { display:grid; gap:12px; margin-top:6px; }
+.input-row.two { grid-template-columns:1fr 1fr; }
+.input-row.three { grid-template-columns:1fr 1fr 1fr; }
+@media(max-width:580px) { .input-row.two,.input-row.three { grid-template-columns:1fr; } }
+.input-label { font-size:12px; color:var(--text-light); margin-bottom:3px; font-weight:500; letter-spacing:0.03em; }
+.input-label .es { color:var(--es-color); font-style:italic; font-weight:400; }
+.dollar-wrap { position:relative; }
+.dollar-wrap::before { content:'$'; position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-light); font-size:14px; pointer-events:none; margin-top:3px; }
+.dollar-wrap input { padding-left:24px; }
+
+/* CHECKBOXES */
+.checkbox-group { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.checkbox-group label { display:flex; align-items:center; gap:7px; padding:7px 14px; border:1px solid var(--border); border-radius:20px; cursor:pointer; font-size:13.5px; transition:all 0.15s; user-select:none; background:#fafafa; }
+.checkbox-group label:hover { border-color:var(--gold); background:#fdf8ee; }
+.checkbox-group input[type="checkbox"], .checkbox-group input[type="radio"] { width:auto; margin:0; accent-color:var(--gold); cursor:pointer; }
+
+/* SUB-QUESTION */
+.sub-q { margin-top:12px; padding:12px 16px; background:var(--section-bg); border-radius:6px; border-left:3px solid var(--border); }
+.sub-q .q-label { font-size:13.5px; font-weight:500; }
+.sub-q .q-label-es { font-size:12.5px; }
+
+/* SUBMIT BUTTON */
+.submit-row { display:flex; justify-content:center; margin-top:28px; }
+.submit-btn {
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+  color:white; border:none; padding:16px 48px; border-radius:6px;
+  font-family:'DM Sans',sans-serif; font-size:16px; font-weight:600;
+  cursor:pointer; letter-spacing:0.02em; transition:all 0.2s;
+  box-shadow:0 4px 14px rgba(26,45,78,0.3);
+}
+.submit-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(26,45,78,0.4); }
+.submit-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+/* BANNERS */
+.banner { border-radius:10px; padding:18px 22px; margin-bottom:24px; font-size:15px; line-height:1.6; display:none; }
+.banner.active { display:block; }
+.banner.success { background:#d4edda; border:1px solid #c3e6cb; color:var(--success); }
+.banner.error { background:#f8d7da; border:1px solid #f5c2c7; color:var(--error); }
+
+/* UPLOAD NOTE — Section 7 */
+.upload-note { background:#eef1f7; border-left:4px solid var(--navy-mid); padding:16px 20px; border-radius:0 6px 6px 0; margin-top:12px; font-size:14px; color:var(--text-mid); line-height:1.65; }
+.upload-note .es-note { margin-top:10px; color:var(--es-color); font-style:italic; }
+
+/* Hidden Netlify detection form */
+.netlify-hidden { display:none; }
+</style>
+</head>
+<body>
+
+<!-- Hidden Netlify static detection form (required for single-file deploy) -->
+<form name="voltaic-vis-detect" netlify netlify-honeypot="bot-field" class="netlify-hidden">
+  <input name="bot-field"><input name="full_name"><input name="pin">
+</form>
+
+<div class="page-wrap">
+  <header>
+    <div class="firm-name">Pioneer Legal Consulting, LLC</div>
+    <div class="firm-sub">Consumer Advocacy · Solar Fraud Recovery</div>
+    <div class="form-title">
+      Solar Client Intake Form · Referred by Voltaic Enterprises
+      <span class="es">Formulario de Admisión del Cliente Solar · Referido por Voltaic Enterprises</span>
+    </div>
+    <div class="contact-bar">445 133rd Ave, Wayland, MI 49348 · 313-635-3709 · wsnyder@plc-us.com</div>
+  </header>
+
+  <div class="banner success" id="banner-success">
+    <strong>✅ Thank you! Your intake form has been submitted.</strong> A secure upload link will be sent to your email so you can attach your documents.<br>
+    <span style="font-style:italic;color:#2d6a4f;margin-top:6px;display:block;">✅ ¡Gracias! Su formulario ha sido enviado. Recibirá un enlace seguro por correo electrónico para adjuntar sus documentos.</span>
+  </div>
+  <div class="banner error" id="banner-error">
+    <strong>There was a problem submitting your form.</strong> Please try again or call 313-635-3709.<br>
+    <span style="font-style:italic;color:#842029;">Hubo un problema. Por favor intente de nuevo o llame al 313-635-3709.</span>
+  </div>
+
+  <div class="progress-wrap no-print">
+    <div class="progress-label"><span>Form Progress · Progreso del Formulario</span><span id="progress-pct">0%</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="instructions">
+    <strong>Instructions:</strong> Please answer as many questions as possible. All information is strictly confidential and used only to evaluate your solar case.<br>
+    <span class="es-note"><strong>Instrucciones:</strong> Por favor responda tantas preguntas como sea posible. Toda la información es estrictamente confidencial y se usa únicamente para evaluar su caso solar.</span>
+  </div>
+
+  <form id="intake-form">
+    <!-- Hidden Netlify form detection field -->
+    <input type="hidden" name="form-name" value="voltaic-vis-detect">
+
+    <!-- ============================================================
+         SECTION 0 — CLIENT CONTACT
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">0</span>
+        <div>
+          <div class="section-title">Client Contact Information</div>
+          <div class="section-title-es">Información de contacto del cliente</div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Full Name <span class="req">*</span></div>
+        <div class="q-label-es">Nombre completo</div>
+        <input type="text" name="full_name" required placeholder="First Last">
+      </div>
+      <div class="q-block alt-bg">
+        <div class="input-row two">
+          <div>
+            <div class="q-label">Phone <span class="req">*</span></div>
+            <div class="q-label-es">Teléfono</div>
+            <input type="tel" name="phone" required placeholder="(555) 555-5555">
+          </div>
+          <div>
+            <div class="q-label">Email</div>
+            <div class="q-label-es">Correo electrónico</div>
+            <input type="email" name="email" placeholder="your@email.com">
+          </div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">Property Address with Solar <span class="req">*</span></div>
+        <div class="q-label-es">Dirección de la propiedad con paneles solares</div>
+        <input type="text" name="property_address" required placeholder="123 Main St, City, State ZIP">
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 1 — HOW THE SALE HAPPENED
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">1</span>
+        <div>
+          <div class="section-title">How the Sale Happened</div>
+          <div class="section-title-es">Cómo ocurrió la venta</div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q1.</span> How were you first contacted about solar?</div>
+        <div class="q-label-es">¿Cómo fue su primer contacto sobre energía solar?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q1_contact" value="Door knock"> Door knock / Toque a la puerta</label>
+          <label><input type="radio" name="q1_contact" value="Phone call"> Phone call / Llamada telefónica</label>
+          <label><input type="radio" name="q1_contact" value="Social media"> Social media / Redes sociales</label>
+          <label><input type="radio" name="q1_contact" value="Community event"> Community event / Evento comunitario</label>
+          <label><input type="radio" name="q1_contact" value="Referral"> Referral / Referido</label>
+          <label><input type="radio" name="q1_contact" value="Other"> Other / Otro</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">If other or referral, please describe: <span class="q-label-es" style="display:inline">/ Si es otro o referido, describa:</span></div>
+          <textarea name="q1_other" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q2.</span> What promises did the salesperson make about the solar system?</div>
+        <div class="q-label-es">¿Qué promesas hizo el vendedor sobre el sistema solar?</div>
+        <textarea name="q2_promises" class="large" placeholder="Describe all promises made..."></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q3.</span> Were you told the solar panels would eliminate your electric bill?</div>
+        <div class="q-label-es">¿Le dijeron que los paneles solares eliminarían su factura eléctrica?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q3_eliminate" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q3_eliminate" value="No"> No</label>
+          <label><input type="radio" name="q3_eliminate" value="Partially"> Partially / Parcialmente</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">Details: <span class="q-label-es" style="display:inline">/ Detalles:</span></div>
+          <textarea name="q3_details" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q4a.</span> Were you promised a government check or rebate?</div>
+        <div class="q-label-es">¿Le prometieron un cheque o reembolso del gobierno?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q4a_govcheck" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q4a_govcheck" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">If yes, what amount were you told? / ¿Cuánto le dijeron?</div>
+          <input type="text" name="q4a_amount" placeholder="$">
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q4b.</span> Was a "dealer fee buydown" or loan reduction mentioned?</div>
+        <div class="q-label-es">¿Se mencionó una reducción del préstamo o "dealer fee buydown"?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q4b_buydown" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q4b_buydown" value="No"> No</label>
+          <label><input type="radio" name="q4b_buydown" value="Unsure"> Unsure / No estoy seguro/a</label>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q4c.</span> Were you told the truth about the federal tax credit?</div>
+        <div class="q-label-es">¿Le dijeron la verdad sobre el crédito fiscal federal?</div>
+        <textarea name="q4c_tax_reality" rows="2" placeholder="Describe what you were told..."></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q5.</span> Were you told about a UCC lien that would be placed on your home?</div>
+        <div class="q-label-es">¿Le informaron sobre un gravamen UCC que se colocaría en su casa?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q5_lien" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q5_lien" value="No"> No</label>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q6a.</span> Were you informed of your right to cancel (3-day rescission)?</div>
+        <div class="q-label-es">¿Le informaron sobre su derecho de cancelación (rescisión de 3 días)?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q6a_rescission" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q6a_rescission" value="No"> No</label>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q6b.</span> Were you given a written Notice of Cancellation?</div>
+        <div class="q-label-es">¿Le dieron un Aviso de Cancelación por escrito?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q6b_notice" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q6b_notice" value="No"> No</label>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q7a.</span> How did you sign the contract?</div>
+        <div class="q-label-es">¿Cómo firmó el contrato?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q7a_signing" value="DocuSign / tablet"> DocuSign / Tablet</label>
+          <label><input type="radio" name="q7a_signing" value="Paper"> Paper / Papel</label>
+          <label><input type="radio" name="q7a_signing" value="Other"> Other / Otro</label>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q7b.</span> Were you given a copy of the contract?</div>
+        <div class="q-label-es">¿Le dieron una copia del contrato?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q7b_copy" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q7b_copy" value="No"> No</label>
+          <label><input type="radio" name="q7b_copy" value="Later"> Later / Después</label>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q8.</span> Did you feel pressured or rushed to sign?</div>
+        <div class="q-label-es">¿Se sintió presionado/a o apresurado/a para firmar?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q8_pressure" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q8_pressure" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">Please describe: / Por favor describa:</div>
+          <textarea name="q8_details" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q9.</span> Were you told this loan would appear on your credit report?</div>
+        <div class="q-label-es">¿Le dijeron que este préstamo aparecería en su informe de crédito?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q9_credit_disclosure" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q9_credit_disclosure" value="No"> No</label>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q10.</span> What language was the contract in? Did you need an interpreter?</div>
+        <div class="q-label-es">¿En qué idioma estaba el contrato? ¿Necesitó un intérprete?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q10_language" value="English only"> English only / Solo inglés</label>
+          <label><input type="radio" name="q10_language" value="Spanish only"> Spanish only / Solo español</label>
+          <label><input type="radio" name="q10_language" value="Both"> Both / Ambos</label>
+          <label><input type="radio" name="q10_language" value="Interpreter provided"> Interpreter provided</label>
+          <label><input type="radio" name="q10_language" value="No interpreter needed"> No interpreter needed</label>
+          <label><input type="radio" name="q10_language" value="Other"> Other / Otro</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">Primary language: / Idioma principal:</div>
+          <input type="text" name="q10_language_other" placeholder="e.g. Spanish, Vietnamese...">
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 2 — SYSTEM PERFORMANCE
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">2</span>
+        <div>
+          <div class="section-title">System Performance</div>
+          <div class="section-title-es">Rendimiento del sistema</div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q11.</span> What was your average monthly electric bill BEFORE solar?</div>
+        <div class="q-label-es">¿Cuál era su factura eléctrica mensual promedio ANTES del solar?</div>
+        <div class="dollar-wrap" style="max-width:200px"><input type="text" name="q11_bill_before" placeholder="0.00"></div>
+        <div style="margin-top:14px">
+          <div class="q-label">What is your average electric bill NOW?</div>
+          <div class="q-label-es">¿Cuánto paga ahora de electricidad?</div>
+          <div class="dollar-wrap" style="max-width:200px"><input type="text" name="q11_bill_after" placeholder="0.00"></div>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q12.</span> What is your monthly solar loan / lease payment?</div>
+        <div class="q-label-es">¿Cuánto es su pago mensual del préstamo / arrendamiento solar?</div>
+        <div class="dollar-wrap" style="max-width:200px"><input type="text" name="q12_solar_payment" placeholder="0.00"></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q13.</span> Are the panels actually producing power?</div>
+        <div class="q-label-es">¿Los paneles están produciendo energía actualmente?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q13_production" value="Yes, fully"> Yes, fully / Sí, completamente</label>
+          <label><input type="radio" name="q13_production" value="Partially"> Partially / Parcialmente</label>
+          <label><input type="radio" name="q13_production" value="No"> No</label>
+          <label><input type="radio" name="q13_production" value="Unknown"> Unknown / Desconocido</label>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q14.</span> Were you given a breakdown of the total cost of the system?</div>
+        <div class="q-label-es">¿Le dieron un desglose del costo total del sistema?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q14_breakdown" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q14_breakdown" value="No"> No</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 3 — PROPERTY & HEALTH
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">3</span>
+        <div>
+          <div class="section-title">Property & Health</div>
+          <div class="section-title-es">Propiedad y salud</div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q15.</span> Has your property been damaged during installation?</div>
+        <div class="q-label-es">¿Su propiedad resultó dañada durante la instalación?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q15_damage" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q15_damage" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">Please describe the damage: / Describa el daño:</div>
+          <textarea name="q15_damage_details" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q16.</span> Has the company attempted to repair the damage?</div>
+        <div class="q-label-es">¿Ha intentado la empresa reparar el daño?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q16_repairs" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q16_repairs" value="No"> No</label>
+          <label><input type="radio" name="q16_repairs" value="N/A"> N/A</label>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q17.</span> Have you or your family experienced health concerns related to the installation?</div>
+        <div class="q-label-es">¿Usted o su familia han experimentado problemas de salud relacionados con la instalación?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q17_health" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q17_health" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">Details: / Detalles:</div>
+          <textarea name="q17_health_details" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q18.</span> Was a roof inspection or roof work discussed before installation?</div>
+        <div class="q-label-es">¿Se habló de una inspección del techo o trabajo en el techo antes de la instalación?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q18_roof" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q18_roof" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">If yes, what was the cost / what happened? / Si sí, ¿cuál fue el costo / qué pasó?</div>
+          <input type="text" name="q18_roof_cost">
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 4 — FINANCIAL & CREDIT
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">4</span>
+        <div>
+          <div class="section-title">Financial & Credit Impact</div>
+          <div class="section-title-es">Impacto financiero y crediticio</div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q19.</span> Has your credit score been affected by the solar loan?</div>
+        <div class="q-label-es">¿Ha sido afectado su crédito por el préstamo solar?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q19_credit" value="Yes, negatively"> Yes, negatively / Sí, negativamente</label>
+          <label><input type="radio" name="q19_credit" value="No change"> No change / Sin cambio</label>
+          <label><input type="radio" name="q19_credit" value="Unsure"> Unsure / No sé</label>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q20.</span> Are you currently behind on solar loan or lease payments?</div>
+        <div class="q-label-es">¿Está atrasado/a en los pagos del préstamo o arrendamiento solar?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q20_behind" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q20_behind" value="No"> No</label>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q21.</span> Are you experiencing financial hardship because of the solar agreement?</div>
+        <div class="q-label-es">¿Está experimentando dificultades financieras a causa del contrato solar?</div>
+        <textarea name="q21_hardship" rows="2" placeholder="Describe any financial hardship..."></textarea>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 5 — PRIOR CONTACT & OTHER
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">5</span>
+        <div>
+          <div class="section-title">Prior Contact & Other</div>
+          <div class="section-title-es">Contacto previo y otros</div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q22.</span> Have you contacted the solar company or lender about these problems?</div>
+        <div class="q-label-es">¿Ha contactado a la empresa solar o prestamista sobre estos problemas?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q22_prior_contact" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q22_prior_contact" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">What was their response? / ¿Cuál fue su respuesta?</div>
+          <textarea name="q22_response" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q23.</span> Have you filed any complaints with government agencies (CFPB, State AG, BBB)?</div>
+        <div class="q-label-es">¿Ha presentado quejas ante agencias gubernamentales (CFPB, Fiscal General, BBB)?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q23_complaints" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q23_complaints" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">Agency and date: / Agencia y fecha:</div>
+          <input type="text" name="q23_agency">
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q24.</span> Is there any pending legal action related to your solar agreement?</div>
+        <div class="q-label-es">¿Hay alguna acción legal pendiente relacionada con su contrato solar?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q24_legal" value="Yes"> Yes / Sí</label>
+          <label><input type="radio" name="q24_legal" value="No"> No</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">Details: / Detalles:</div>
+          <textarea name="q24_legal_details" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="q-block alt-bg">
+        <div class="q-label"><span class="q-num">Q25.</span> Were you the original signer, or did someone else sign on your behalf?</div>
+        <div class="q-label-es">¿Fue usted el firmante original, o alguien firmó en su nombre?</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="q25_original" value="Original signer"> Original signer / Firmante original</label>
+          <label><input type="radio" name="q25_original" value="Someone else signed"> Someone else signed / Otra persona firmó</label>
+        </div>
+        <div class="sub-q">
+          <div class="q-label">If other, details: / Si fue otro, detalles:</div>
+          <textarea name="q25_assumed_details" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 6 — CLIENT STATEMENT
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">6</span>
+        <div>
+          <div class="section-title">Full Client Statement</div>
+          <div class="section-title-es">Declaración completa del cliente</div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">Q26.</span> In your own words, describe everything that happened with your solar installation — from the first contact to now.</div>
+        <div class="q-label-es">En sus propias palabras, describa todo lo que ocurrió con su instalación solar, desde el primer contacto hasta hoy.</div>
+        <textarea name="q26_statement" class="large" placeholder="Tell your full story here..."></textarea>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 7 — DOCUMENT UPLOAD NOTE
+         (Uploads are decoupled — client gets a secure link via email)
+         ============================================================ -->
+    <div class="form-card">
+      <div class="section-header">
+        <span class="section-num">7</span>
+        <div>
+          <div class="section-title">Your Documents</div>
+          <div class="section-title-es">Sus documentos</div>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="upload-note">
+          <strong>📎 Document upload is handled separately.</strong> After you submit this form, you will receive a secure upload link at the email address you provided above. Use that link to upload your solar contract, utility bills, ID, and any other documents.<br>
+          <span class="es-note">📎 <strong>La carga de documentos se realiza por separado.</strong> Después de enviar este formulario, recibirá un enlace seguro en el correo electrónico que proporcionó arriba. Use ese enlace para subir su contrato solar, facturas eléctricas, identificación y cualquier otro documento.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-row">
+      <button type="submit" class="submit-btn" id="submit-btn">
+        Submit Intake Form · Enviar Formulario
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+// ── PROGRESS ──
+function updateProgress() {
+  const inputs = document.querySelectorAll('#intake-form input[type="text"], #intake-form input[type="email"], #intake-form input[type="tel"], #intake-form textarea');
+  const radioGroups = {};
+  document.querySelectorAll('#intake-form input[type="radio"]').forEach(r => { if(!radioGroups[r.name]) radioGroups[r.name]=false; if(r.checked) radioGroups[r.name]=true; });
+  const total = inputs.length + Object.keys(radioGroups).length;
+  let filled = 0;
+  inputs.forEach(el => { if(el.value.trim()) filled++; });
+  Object.values(radioGroups).forEach(v => { if(v) filled++; });
+  const pct = total ? Math.min(100, Math.round((filled / total) * 100)) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+}
+
+document.querySelectorAll('#intake-form input, #intake-form textarea').forEach(el => {
+  el.addEventListener('change', updateProgress);
+  el.addEventListener('input', updateProgress);
+});
+
+// ── FORM SUBMIT → Google Apps Script ──
+// SWAP: Replace with the Voltaic Apps Script /exec URL after deployment.
+const SCRIPT_URL = 'https://script.google.com/macros/s/REPLACE_AFTER_DEPLOY/exec';
+
+document.getElementById('intake-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting... / Enviando...';
+
+  // Collect form field values (text only — documents come via secure upload link)
+  const data = {};
+  data.form_type = 'VE_VIS';
+  // Pull pin, lang, and rep_name from URL query params if present
+  { var _pin=new URLSearchParams(window.location.search).get('pin'); if(_pin) data.pin=_pin;
+    var _lng=new URLSearchParams(window.location.search).get('lang'); if(_lng) data.lang=_lng;
+    var _rep=new URLSearchParams(window.location.search).get('rep_name'); if(_rep) data.rep_name=_rep; }
+  const formData = new FormData(this);
+  formData.forEach((val, key) => { if (key !== 'form-name') data[key] = val; });
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(data)
+    });
+    // no-cors means we can't read the response — assume success
+    document.getElementById('banner-success').classList.add('active');
+    document.getElementById('intake-form').style.display = 'none';
+    window.scrollTo({top:0, behavior:'smooth'});
+  } catch(err) {
+    document.getElementById('banner-error').classList.add('active');
+    btn.disabled = false;
+    btn.textContent = 'Submit Intake Form · Enviar Formulario';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+});
+</script>
+
+<!-- Prefill from URL params (rep tool passes client info in querystring) -->
+<script>(function(){var p=new URLSearchParams(window.location.search);if(!p.get('prefilled'))return;[['full_name','full_name'],['property_address','property_address'],['email','email'],['phone','phone']].forEach(function(m){var v=p.get(m[0]);if(!v)return;var el=document.querySelector('[name="'+m[1]+'"]');if(el)el.value=v;});})();</script>
+</body>
+</html>
